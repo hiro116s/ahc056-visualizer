@@ -1,1 +1,1570 @@
-hello
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AHC056 visualizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        .input-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .seed-input-group {
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .seed-input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .seed-input-group input[type="number"] {
+            width: 200px;
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .seed-input-group input[type="number"]:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        .mode-selector {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #e3f2fd;
+            border-radius: 4px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .mode-selector h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .mode-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .mode-button {
+            padding: 10px 20px;
+            border: 2px solid #2196F3;
+            background-color: white;
+            color: #2196F3;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .mode-button:hover {
+            background-color: #e3f2fd;
+        }
+
+        .mode-button.active {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .controls h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .radio-group input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        details {
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            background-color: #fafafa;
+        }
+
+        details[open] {
+            background-color: white;
+        }
+
+        summary {
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            padding: 5px;
+            color: #555;
+            user-select: none;
+        }
+
+        summary:hover {
+            color: #2196F3;
+        }
+
+        details textarea {
+            margin-top: 10px;
+        }
+
+        .grid-container {
+            border: 2px solid #333;
+            display: inline-block;
+            background-color: white;
+        }
+
+        .grid-table {
+            border-collapse: collapse;
+        }
+
+        .grid-cell {
+            width: 60px;
+            height: 60px;
+            border: 1px solid #ddd;
+            text-align: center;
+            vertical-align: middle;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            position: relative;
+        }
+
+        .grid-cell-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            font-weight: 600;
+        }
+
+        .info-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-radius: 4px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .info-section p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .table-container {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: center;
+            font-size: 13px;
+            min-width: 60px;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: 600;
+        }
+
+        td:first-child {
+            background-color: #f9f9f9;
+            font-weight: 600;
+        }
+
+        .rule-cell {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.15s;
+            cursor: pointer;
+        }
+
+        .rule-cell:hover {
+            transform: scale(1.08);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            position: relative;
+        }
+
+        .rule-cell.highlighted {
+            outline: 5px solid #FF1744;
+            outline-offset: -5px;
+            z-index: 50;
+        }
+
+        .undefined-cell {
+            background-color: #f5f5f5;
+            color: #999;
+            font-style: italic;
+        }
+
+        .error-message {
+            padding: 15px;
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            color: #c62828;
+        }
+
+        .stats-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .stats-section h3 {
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .stats-items {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 280px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .stats-items::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .stats-items::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .stats-items::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        .stats-items::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .stats-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.15s;
+            cursor: pointer;
+        }
+
+        .stats-item:hover {
+            background-color: #e0e0e0;
+            transform: translateX(5px);
+        }
+
+        .stats-item.highlighted {
+            outline: 5px solid #FF1744;
+            outline-offset: -5px;
+        }
+
+        .stats-color {
+            width: 40px;
+            height: 25px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .stats-text {
+            flex-grow: 1;
+        }
+
+        .stats-count {
+            font-weight: 600;
+            color: #555;
+            min-width: 60px;
+            text-align: right;
+        }
+
+        /* Robot mode styles */
+        .robot-grid-cell {
+            position: relative;
+            border: 1px solid #ddd;
+        }
+
+        .robot-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            z-index: 10;
+        }
+
+        .target-icon {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 16px;
+            z-index: 5;
+        }
+
+        .cell-color-indicator {
+            font-size: 10px;
+            font-weight: bold;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+        }
+
+        .robot-wall-v {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background-color: #000;
+        }
+
+        .robot-wall-h {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: #000;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🤖 AHC056 visualizer</h1>
+
+        <details>
+            <summary>使い方</summary>
+            <div style="padding: 15px; background-color: #f9f9f9; border-radius: 4px; margin-top: 10px;">
+                <h3 style="margin-top: 0;">基本操作</h3>
+                <ul style="line-height: 1.8;">
+                    <li><strong>Seed入力:</strong>
+                        0-999の範囲でシード番号を入力すると、自動的に<code>in/{seed}.txt</code>と<code>out/{seed}.out</code>を読み込みます。また、入力データと出力データの欄に直接文字列をコピペして使用することもできます
+                    </li>
+                    <li><strong>更新ボタン:</strong> 入力したシードのファイルを再読み込みします</li>
+                    <li><strong>入力欄を折り畳むボタン:</strong> 入力データと出力データの入力欄を一括で折りたたみ/展開します</li>
+                </ul>
+                <h3>表示モード</h3>
+                <ul style="line-height: 1.8;">
+                    <li><strong>RuleMap:</strong>
+                        遷移規則を色分けして表に表示します。同じ(a,s,d)の組み合わせには同じ色が付きます。セルやグラフにマウスをホバーすると、同じ規則がハイライトされます</li>
+                    <li><strong>Grid:</strong> ロボットの移動シミュレーションを実行し、各セルの訪問統計を表示します。表示するメトリクス（訪問回数、直線、曲がり角など）を選択できます</li>
+                    <li><strong>Robot:</strong> ロボットの移動を1ステップずつ確認できます。自動再生機能もあります</li>
+                </ul>
+            </div>
+        </details>
+
+        <div class="seed-input-group">
+            <label for="seedInput">Seed (0-999):</label>
+            <input type="number" id="seedInput" min="0" max="999" value="0" placeholder="0">
+            <button id="refreshBtn"
+                style="margin-left: 10px; padding: 8px 16px; cursor: pointer; background-color: #4CAF50; color: white; border: none; border-radius: 4px;">更新</button>
+            <button id="collapseAllBtn"
+                style="margin-left: 10px; padding: 8px 16px; cursor: pointer; background-color: #2196F3; color: white; border: none; border-radius: 4px;">入力欄を折り畳む</button>
+        </div>
+
+        <details open>
+            <summary>入力データ</summary>
+            <textarea id="problemInput" placeholder="N K T&#10;v[0] ...&#10;h[0] ...&#10;x[0] y[0]&#10;..."></textarea>
+        </details>
+
+        <details open>
+            <summary>出力データ</summary>
+            <textarea id="outputInput"
+                placeholder="C Q M&#10;s[0][0] ... s[0][N-1]&#10;...&#10;c q a s d&#10;..."></textarea>
+        </details>
+
+        <div class="mode-selector">
+            <h3>表示モード</h3>
+            <div class="mode-buttons">
+                <button class="mode-button active" data-mode="rulemap">RuleMap</button>
+                <button class="mode-button" data-mode="grid">Grid</button>
+                <button class="mode-button" data-mode="robot">Robot</button>
+            </div>
+        </div>
+
+        <div id="infoSection" style="display: none;"></div>
+        <div id="ruleMapControls" class="controls">
+            <h3>表示パラメータ (RuleMap)</h3>
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" id="checkA" checked>
+                    <span>a (塗り替える色)</span>
+                </label>
+                <label>
+                    <input type="checkbox" id="checkS" checked>
+                    <span>s (新しい状態)</span>
+                </label>
+                <label>
+                    <input type="checkbox" id="checkD" checked>
+                    <span>d (移動方向)</span>
+                </label>
+            </div>
+        </div>
+        <div id="robotControls" class="controls" style="display: none;">
+            <h3>シミュレーション制御 (Robot)</h3>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <button id="btnStep" style="padding: 8px 16px; cursor: pointer;">▶ 1ステップ進む</button>
+                <button id="btnReset" style="padding: 8px 16px; cursor: pointer;">🔄 リセット</button>
+                <button id="btnAutoPlay" style="padding: 8px 16px; cursor: pointer;">⏯ 自動再生</button>
+            </div>
+            <div style="margin-top: 10px;">
+                <label>速度: </label>
+                <input type="range" id="speedSlider" min="1" max="10" value="5" style="width: 200px;">
+                <span id="speedLabel">5</span>
+            </div>
+        </div>
+
+        <div id="gridControls" class="controls" style="display: none;">
+            <h3>表示パラメータ (Grid)</h3>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="gridMetric" id="metricVisitCount" value="visitCount" checked>
+                    <span>訪問回数 (このセルを訪れた回数)</span>
+                </label>
+                <label>
+                    <input type="radio" name="gridMetric" id="metricStraight" value="straight">
+                    <span>直線 (前回と同じ方向に進む回数)</span>
+                </label>
+                <label>
+                    <input type="radio" name="gridMetric" id="metricTurn" value="turn">
+                    <span>曲がり角 (前回と違う方向に進む回数)</span>
+                </label>
+                <label>
+                    <input type="radio" name="gridMetric" id="metricStraightCost" value="straightCost">
+                    <span>直線コスト (最後の曲がり角より前の直線回数)</span>
+                </label>
+                <label>
+                    <input type="radio" name="gridMetric" id="metricExpectedCost" value="expectedCost">
+                    <span>期待コスト (曲がり角 + 直線コスト)</span>
+                </label>
+            </div>
+        </div>
+
+
+        <div id="errorSection" style="display: none;"></div>
+        <div id="ruleMapSection">
+            <div id="tableSection"></div>
+            <div id="statsSection"></div>
+        </div>
+        <div id="gridSection" style="display: none;"></div>
+        <div id="robotSection" style="display: none;"></div>
+    </div>
+
+    <script>
+        // カラーパレット（視覚的に区別しやすい色）
+        const COLOR_PALETTE = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
+            '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B739', '#52B788',
+            '#FFB6C1', '#DDA15E', '#06FFA5', '#C77DFF', '#FF9770',
+            '#06D6A0', '#FFD23F', '#EE6352', '#59CD90', '#3FA7D6',
+            '#FAC748', '#FF5E5B', '#00BBF9', '#F15BB5', '#00F5FF',
+            '#9B59B6', '#E74C3C', '#3498DB', '#2ECC71', '#F39C12',
+            '#1ABC9C', '#D35400', '#C0392B', '#16A085', '#27AE60',
+            '#2980B9', '#8E44AD', '#2C3E50', '#F1C40F', '#E67E22'
+        ];
+
+        let parsedData = null;
+        let parsedInput = null;
+        let parsedOutput = null;
+        let colorMap = new Map();
+        let colorIndex = 0;
+        let currentMode = 'rulemap';
+
+        // Robot mode state
+        let robotState = null;
+        let autoPlayInterval = null;
+        let autoPlaySpeed = 5;
+
+        const seedInput = document.getElementById('seedInput');
+        const problemInput = document.getElementById('problemInput');
+        const outputInput = document.getElementById('outputInput');
+        const checkA = document.getElementById('checkA');
+        const checkS = document.getElementById('checkS');
+        const checkD = document.getElementById('checkD');
+
+        // Grid mode radio buttons
+        const metricRadios = document.querySelectorAll('input[name="gridMetric"]');
+
+        // モードボタンのイベントリスナー
+        document.querySelectorAll('.mode-button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.mode-button').forEach(b => b.classList.remove('active'));
+                button.classList.add('active');
+                currentMode = button.getAttribute('data-mode');
+                switchMode();
+            });
+        });
+
+        // イベントリスナー
+        seedInput.addEventListener('input', loadFilesForSeed);
+        problemInput.addEventListener('input', parseAndVisualize);
+        outputInput.addEventListener('input', parseAndVisualize);
+
+        // 更新ボタン
+        document.getElementById('refreshBtn').addEventListener('click', loadFilesForSeed);
+
+        // 入力欄を折り畳むボタン
+        document.getElementById('collapseAllBtn').addEventListener('click', () => {
+            const details = document.querySelectorAll('details');
+            const allOpen = Array.from(details).every(d => d.open);
+            details.forEach(d => d.open = !allOpen);
+            document.getElementById('collapseAllBtn').textContent = allOpen ? '入力欄を展開する' : '入力欄を折り畳む';
+        });
+        checkA.addEventListener('change', updateVisualization);
+        checkS.addEventListener('change', updateVisualization);
+        checkD.addEventListener('change', updateVisualization);
+
+        // Grid mode radio button listeners
+        metricRadios.forEach(radio => {
+            radio.addEventListener('change', updateVisualization);
+        });
+
+        // Robot mode controls
+        const btnStep = document.getElementById('btnStep');
+        const btnReset = document.getElementById('btnReset');
+        const btnAutoPlay = document.getElementById('btnAutoPlay');
+        const speedSlider = document.getElementById('speedSlider');
+        const speedLabel = document.getElementById('speedLabel');
+
+        if (btnStep) btnStep.addEventListener('click', stepRobot);
+        if (btnReset) btnReset.addEventListener('click', resetRobot);
+        if (btnAutoPlay) btnAutoPlay.addEventListener('click', toggleAutoPlay);
+        if (speedSlider) {
+            speedSlider.addEventListener('input', (e) => {
+                autoPlaySpeed = parseInt(e.target.value);
+                speedLabel.textContent = autoPlaySpeed;
+            });
+        }
+
+        // ページ読み込み時に初期ファイルを読み込む
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFilesForSeed();
+        });
+
+        function switchMode() {
+            if (currentMode === 'rulemap') {
+                document.getElementById('ruleMapControls').style.display = 'block';
+                document.getElementById('gridControls').style.display = 'none';
+                document.getElementById('robotControls').style.display = 'none';
+                document.getElementById('ruleMapSection').style.display = 'block';
+                document.getElementById('gridSection').style.display = 'none';
+                document.getElementById('robotSection').style.display = 'none';
+                stopAutoPlay();
+            } else if (currentMode === 'grid') {
+                document.getElementById('ruleMapControls').style.display = 'none';
+                document.getElementById('gridControls').style.display = 'block';
+                document.getElementById('robotControls').style.display = 'none';
+                document.getElementById('ruleMapSection').style.display = 'none';
+                document.getElementById('gridSection').style.display = 'block';
+                document.getElementById('robotSection').style.display = 'none';
+                stopAutoPlay();
+            } else if (currentMode === 'robot') {
+                document.getElementById('ruleMapControls').style.display = 'none';
+                document.getElementById('gridControls').style.display = 'none';
+                document.getElementById('robotControls').style.display = 'block';
+                document.getElementById('ruleMapSection').style.display = 'none';
+                document.getElementById('gridSection').style.display = 'none';
+                document.getElementById('robotSection').style.display = 'block';
+            }
+            updateVisualization();
+        }
+
+        async function loadFilesForSeed() {
+            const seed = parseInt(seedInput.value);
+
+            if (isNaN(seed) || seed < 0 || seed >= 2000) {
+                return;
+            }
+
+            try {
+                // 入力ファイルを読み込む
+                const inputResponse = await fetch(`in/${seed}.txt`);
+                if (inputResponse.ok) {
+                    const inputText = await inputResponse.text();
+                    problemInput.value = inputText;
+                } else {
+                    console.warn(`入力ファイル in/${seed}.txt が見つかりません`);
+                }
+
+                // 出力ファイルを読み込む
+                const outputResponse = await fetch(`out/${seed}.out`);
+                if (outputResponse.ok) {
+                    const outputText = await outputResponse.text();
+                    outputInput.value = outputText;
+                } else {
+                    console.warn(`出力ファイル out/${seed}.out が見つかりません`);
+                }
+
+                // すべてのファイル読み込み後にパースと描画を実行
+                parseAndVisualize();
+            } catch (error) {
+                console.error('ファイル読み込みエラー:', error);
+            }
+        }
+
+        function parseInput(text) {
+            try {
+                const lines = text.trim().split('\n');
+                if (lines.length < 1) {
+                    throw new Error('入力が空です');
+                }
+
+                const [N, K, T] = lines[0].split(/\s+/).map(Number);
+                if (isNaN(N) || isNaN(K) || isNaN(T)) {
+                    throw new Error('最初の行のフォーマットが不正です');
+                }
+
+                // 壁情報を読み込む (v: 縦の壁、各行N-1個)
+                const wall_v = [];
+                for (let i = 0; i < N; i++) {
+                    const line = lines[1 + i];
+                    if (!line) {
+                        throw new Error(`壁情報(v)の${i}行目が存在しません`);
+                    }
+                    const row = line.split('').map(c => c === '1');
+                    if (row.length !== N - 1) {
+                        throw new Error(`壁情報(v)の${i}行目の長さが不正です（期待: ${N - 1}, 実際: ${row.length}）`);
+                    }
+                    wall_v.push(row);
+                }
+
+                const wall_h = [];
+                for (let i = 0; i < N - 1; i++) {
+                    const line = lines[1 + N + i];
+                    if (!line) {
+                        throw new Error(`壁情報(h)の${i}行目が存在しません`);
+                    }
+                    const row = line.split('').map(c => c === '1');
+                    if (row.length !== N) {
+                        throw new Error(`壁情報(h)の${i}行目の長さが不正です（期待: ${N}, 実際: ${row.length}）`);
+                    }
+                    wall_h.push(row);
+                }
+
+                // 目的地を読み込む
+                const targets = [];
+                for (let i = 0; i < K; i++) {
+                    const [x, y] = lines[1 + N + N - 1 + i].split(/\s+/).map(Number);
+                    targets.push([x, y]);
+                }
+
+                return { N, K, T, wall_v, wall_h, targets };
+            } catch (error) {
+                throw new Error(`入力パースエラー: ${error.message}`);
+            }
+        }
+
+        function parseOutput(text) {
+            try {
+                const lines = text.trim().split('\n');
+                if (lines.length < 1) {
+                    throw new Error('入力が空です');
+                }
+
+                const [C, Q, M] = lines[0].split(/\s+/).map(Number);
+
+                if (isNaN(C) || isNaN(Q) || isNaN(M)) {
+                    throw new Error('最初の行のフォーマットが不正です');
+                }
+
+                // グリッドサイズを推定（s配列の行数から）
+                // 各行が5つ以上のトークンを持ち、すべてが数値ならグリッド行
+                let currentLine = 1;
+                const initialColors = [];
+                while (currentLine < lines.length) {
+                    const tokens = lines[currentLine].trim().split(/\s+/);
+                    // ルール行（c q a s d の5トークン、最後が文字）かチェック
+                    if (tokens.length === 5 && ['U', 'D', 'L', 'R', 'S'].includes(tokens[4])) {
+                        // ルール行の開始なのでグリッド終了
+                        break;
+                    }
+                    // グリッド行として読み込み
+                    const row = tokens.map(Number);
+                    if (row.some(isNaN)) {
+                        // 数値でないものがあればグリッド終了
+                        break;
+                    }
+                    initialColors.push(row);
+                    currentLine++;
+                }
+
+                const N = initialColors.length;
+
+                // 遷移規則を解析
+                const rules = new Map();
+                for (let i = currentLine; i < lines.length; i++) {
+                    const tokens = lines[i].trim().split(/\s+/);
+                    if (tokens.length !== 5) continue;
+
+                    const c = parseInt(tokens[0]);
+                    const q = parseInt(tokens[1]);
+                    const a = parseInt(tokens[2]);
+                    const s = parseInt(tokens[3]);
+                    const d = tokens[4];
+
+                    if (isNaN(c) || isNaN(q) || isNaN(a) || isNaN(s)) continue;
+
+                    rules.set(`${c},${q}`, { a, s, d });
+                }
+
+                return { C, Q, M, N, initialColors, rules };
+            } catch (error) {
+                throw new Error(`パースエラー: ${error.message}`);
+            }
+        }
+
+        function getRuleKey(a, s, d, checkStates) {
+            const parts = [];
+            if (checkStates.a) parts.push(`a${a}`);
+            if (checkStates.s) parts.push(`s${s}`);
+            if (checkStates.d) parts.push(`d${d}`);
+            return parts.join('_');
+        }
+
+        function getColorForRule(a, s, d, checkStates) {
+            const key = getRuleKey(a, s, d, checkStates);
+
+            if (!colorMap.has(key)) {
+                colorMap.set(key, COLOR_PALETTE[colorIndex % COLOR_PALETTE.length]);
+                colorIndex++;
+            }
+
+            return colorMap.get(key);
+        }
+
+        function formatRule(a, s, d, checkStates) {
+            const parts = [];
+            if (checkStates.a) parts.push(`${a}`);
+            if (checkStates.s) parts.push(`${s}`);
+            if (checkStates.d) parts.push(`${d}`);
+            return parts.join(',');
+        }
+
+        function updateVisualization() {
+            if (currentMode === 'rulemap') {
+                if (parsedOutput) {
+                    // 色マップをリセット
+                    colorMap.clear();
+                    colorIndex = 0;
+                    visualizeRuleMap(parsedOutput);
+                } else {
+                    document.getElementById('infoSection').style.display = 'none';
+                    document.getElementById('tableSection').innerHTML = '';
+                    document.getElementById('statsSection').innerHTML = '';
+                }
+            } else if (currentMode === 'grid') {
+                if (parsedInput && parsedOutput) {
+                    visualizeGrid(parsedInput, parsedOutput);
+                } else {
+                    document.getElementById('gridSection').innerHTML = `
+                        <div class="error-message">
+                            Gridモードを使用するには、入力データと出力データの両方が必要です。
+                        </div>
+                    `;
+                    document.getElementById('infoSection').innerHTML = `
+                        <div class="info-section">
+                            <p><strong>状態:</strong> ${parsedInput ? '入力データ: OK' : '入力データ: なし'}, ${parsedOutput ? '出力データ: OK' : '出力データ: なし'}</p>
+                        </div>
+                    `;
+                    document.getElementById('infoSection').style.display = 'block';
+                }
+            } else if (currentMode === 'robot') {
+                if (parsedInput && parsedOutput) {
+                    resetRobot();
+                } else {
+                    document.getElementById('robotSection').innerHTML = `
+                        <div class="error-message">
+                            Robotモードを使用するには、入力データと出力データの両方が必要です。
+                        </div>
+                    `;
+                    document.getElementById('infoSection').innerHTML = `
+                        <div class="info-section">
+                            <p><strong>状態:</strong> ${parsedInput ? '入力データ: OK' : '入力データ: なし'}, ${parsedOutput ? '出力データ: OK' : '出力データ: なし'}</p>
+                        </div>
+                    `;
+                    document.getElementById('infoSection').style.display = 'block';
+                }
+            }
+        }
+
+        function parseAndVisualize() {
+            const inputText = problemInput.value;
+            const outputText = outputInput.value;
+
+            document.getElementById('errorSection').innerHTML = '';
+            document.getElementById('errorSection').style.display = 'none';
+
+            // 入力データをパース
+            if (inputText.trim()) {
+                try {
+                    parsedInput = parseInput(inputText);
+                } catch (error) {
+                    document.getElementById('errorSection').innerHTML += `
+                        <div class="error-message">
+                            入力データエラー: ${error.message}
+                        </div>
+                    `;
+                    document.getElementById('errorSection').style.display = 'block';
+                    parsedInput = null;
+                }
+            }
+
+            // 出力データをパース
+            if (outputText.trim()) {
+                try {
+                    parsedOutput = parseOutput(outputText);
+                } catch (error) {
+                    document.getElementById('errorSection').innerHTML += `
+                        <div class="error-message">
+                            出力データエラー: ${error.message}
+                        </div>
+                    `;
+                    document.getElementById('errorSection').style.display = 'block';
+                    parsedOutput = null;
+                }
+            }
+
+            updateVisualization();
+        }
+
+        function visualizeRuleMap(data) {
+            const { C, Q, M, rules } = data;
+
+            const checkStates = {
+                a: checkA.checked,
+                s: checkS.checked,
+                d: checkD.checked
+            };
+
+            // 情報セクション
+            document.getElementById('infoSection').innerHTML = `
+                <div class="info-section">
+                    <p><strong>色数 (C):</strong> ${C}</p>
+                    <p><strong>状態数 (Q):</strong> ${Q}</p>
+                    <p><strong>遷移規則数 (M):</strong> ${M}</p>
+                    <p><strong>定義された規則:</strong> ${rules.size} / ${C * Q}</p>
+                </div>
+            `;
+            document.getElementById('infoSection').style.display = 'block';
+
+            // テーブル作成 (C行Q列)
+            let tableHTML = '<div class="table-container"><table>';
+
+            // ヘッダー行
+            tableHTML += '<tr><th>c \\ q</th>';
+            for (let q = 0; q < Q; q++) {
+                tableHTML += `<th>${q}</th>`;
+            }
+            tableHTML += '</tr>';
+
+            // データ行
+            for (let c = 0; c < C; c++) {
+                tableHTML += `<tr><td>${c}</td>`;
+                for (let q = 0; q < Q; q++) {
+                    const key = `${c},${q}`;
+                    if (rules.has(key)) {
+                        const rule = rules.get(key);
+                        const color = getColorForRule(rule.a, rule.s, rule.d, checkStates);
+                        const ruleKey = getRuleKey(rule.a, rule.s, rule.d, checkStates);
+                        const text = formatRule(rule.a, rule.s, rule.d, checkStates);
+                        const title = `c=${c}, q=${q} → a=${rule.a}, s=${rule.s}, d=${rule.d}`;
+                        tableHTML += `<td class="rule-cell" data-rule-key="${ruleKey}" style="background-color: ${color}; color: white;" title="${title}">${text}</td>`;
+                    } else {
+                        tableHTML += '<td class="undefined-cell">-</td>';
+                    }
+                }
+                tableHTML += '</tr>';
+            }
+
+            tableHTML += '</table></div>';
+            document.getElementById('tableSection').innerHTML = tableHTML;
+
+            // 各遷移規則の出現回数を計算
+            const ruleCount = new Map();
+            rules.forEach((rule, key) => {
+                const ruleKey = getRuleKey(rule.a, rule.s, rule.d, checkStates);
+                ruleCount.set(ruleKey, (ruleCount.get(ruleKey) || 0) + 1);
+            });
+
+            // 出現回数でソート（降順）
+            const sortedRules = Array.from(ruleCount.entries())
+                .sort((a, b) => b[1] - a[1]);
+
+            // 統計セクション作成
+            let statsHTML = '<div class="stats-section"><h3>遷移規則統計（使用回数順）</h3><div class="stats-items">';
+
+            for (const [ruleKey, count] of sortedRules) {
+                const color = colorMap.get(ruleKey);
+                // ruleKeyから元のルールを探す
+                let sampleRule = null;
+                for (const [key, rule] of rules.entries()) {
+                    if (getRuleKey(rule.a, rule.s, rule.d, checkStates) === ruleKey) {
+                        sampleRule = rule;
+                        break;
+                    }
+                }
+                const text = formatRule(sampleRule.a, sampleRule.s, sampleRule.d, checkStates);
+                const fullText = `a=${sampleRule.a}, s=${sampleRule.s}, d=${sampleRule.d}`;
+                statsHTML += `
+                    <div class="stats-item" data-rule-key="${ruleKey}" title="${fullText}">
+                        <div class="stats-color" style="background-color: ${color};"></div>
+                        <div class="stats-text">${text}</div>
+                        <div class="stats-count">${count}回</div>
+                    </div>
+                `;
+            }
+
+            statsHTML += '</div></div>';
+            document.getElementById('statsSection').innerHTML = statsHTML;
+
+            // イベントリスナーを追加
+            addHighlightListeners();
+        }
+
+        function visualizeGrid(inputData, outputData) {
+            if (!inputData || !outputData) {
+                document.getElementById('gridSection').innerHTML = `
+                    <div class="error-message">
+                        Gridモードを使用するには、入力データと出力データの両方が必要です。
+                    </div>
+                `;
+                document.getElementById('infoSection').style.display = 'none';
+                return;
+            }
+
+            const { N, K, T, wall_v, wall_h, targets } = inputData;
+            const { initialColors, rules } = outputData;
+
+            console.log('Grid visualization started');
+            console.log('N:', N, 'K:', K, 'T:', T);
+            console.log('wall_v length:', wall_v.length);
+            console.log('wall_h length:', wall_h.length);
+            console.log('initialColors length:', initialColors.length);
+            console.log('targets:', targets);
+
+            // シミュレーションを実行
+            // 各セルの訪問情報を記録
+            const visitData = Array(N).fill(0).map(() =>
+                Array(N).fill(0).map(() => ({
+                    straight: 0,        // 直線回数
+                    turn: 0,            // 曲がり角回数
+                    straightCost: 0,    // 直線コスト（最後の曲がり角より前の直線回数）
+                    expectedCost: 0,    // 期待コスト（曲がり角 + 直線コスト）
+                    visitCount: 0,      // このセルを訪れた回数
+                    moves: []           // このセルでの全ての移動履歴（方向）
+                }))
+            );
+
+            let pos = targets[0];
+            let state = 0;
+            let colors = initialColors.map(row => [...row]);
+            let prevDir = null;
+            let targetIndex = 1;
+
+            console.log('Initial pos:', pos);
+            console.log('colors dimensions:', colors.length, 'x', colors[0]?.length);
+
+            const dirMap = { 'U': [-1, 0], 'D': [1, 0], 'L': [0, -1], 'R': [0, 1], 'S': [0, 0] };
+
+            let prev_dir = null;
+            for (let step = 0; step < T; step++) {
+                const [r, c] = pos;
+
+                // 範囲チェック
+                if (r < 0 || r >= N || c < 0 || c >= N) {
+                    console.error('Position out of bounds:', r, c);
+                    break;
+                }
+
+                if (!colors[r] || colors[r][c] === undefined) {
+                    console.error('Invalid color access:', r, c, 'colors[r]:', colors[r]);
+                    break;
+                }
+
+                const currentColor = colors[r][c];
+                const key = `${currentColor},${state}`;
+
+                if (!rules.has(key)) break;
+
+                const rule = rules.get(key);
+                colors[r][c] = rule.a;
+                state = rule.s;
+
+                const dir = rule.d;
+                const [dr, dc] = dirMap[dir];
+
+                // 移動可能かチェック
+                let canMove = true;
+                if (dir !== 'S') {
+                    const nr = r + dr;
+                    const nc = c + dc;
+                    if (nr < 0 || nr >= N || nc < 0 || nc >= N) {
+                        canMove = false;
+                    } else {
+                        // 壁チェック
+                        if (dr === 0 && dc !== 0) { // 左右移動
+                            const minC = Math.min(c, nc);
+                            if (r < wall_v.length && minC >= 0 && minC < wall_v[r].length) {
+                                if (wall_v[r][minC]) {
+                                    canMove = false;
+                                }
+                            }
+                        } else if (dc === 0 && dr !== 0) { // 上下移動
+                            const minR = Math.min(r, nr);
+                            if (minR >= 0 && minR < wall_h.length && c >= 0 && c < wall_h[minR].length) {
+                                if (wall_h[minR][c]) {
+                                    canMove = false;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (canMove && dir !== 'S') {
+                    // 現在のセル (r, c) に移動を記録
+                    visitData[r][c].visitCount++;
+                    visitData[r][c].moves.push(prev_dir === null || dir === prev_dir);
+
+                    // このセルでの移動履歴から統計を計算
+                    const moves = visitData[r][c].moves;
+                    let straightCount = 0;
+                    let turnCount = 0;
+                    let straightCost = 0;
+
+                    // 最後のターンより前の直線回数を計算
+                    let lastTurnIndex = -1;
+                    for (let i = 0; i < moves.length; i++) {
+                        if (!moves[i]) {
+                            lastTurnIndex = i;
+                            turnCount++;
+                        }
+                    }
+
+                    // 各移動が直線かターンかをカウント
+                    for (let i = 0; i < moves.length; i++) {
+                        if (moves[i]) {
+                            straightCount++;
+                            if (i < lastTurnIndex) {
+                                straightCost++;
+                            }
+                        }
+                    }
+
+                    visitData[r][c].straight = straightCount;
+                    visitData[r][c].turn = turnCount;
+                    visitData[r][c].straightCost = straightCost;
+                    visitData[r][c].expectedCost = turnCount + straightCost;
+
+                    prevDir = dir;
+                    pos = [r + dr, c + dc];
+
+                    // 目的地チェック
+                    if (pos[0] === targets[targetIndex][0] && pos[1] === targets[targetIndex][1]) {
+                        targetIndex++;
+                    }
+                }
+                prev_dir = dir;
+                if (targetIndex == K) {
+                    break;
+                }
+            }
+
+            // 選択されているメトリクスを取得
+            const selectedMetric = document.querySelector('input[name="gridMetric"]:checked')?.value || 'straight';
+
+            // 最大値を計算（カラーグラデーション用）
+            let maxValue = 0;
+            for (let i = 0; i < N; i++) {
+                for (let j = 0; j < N; j++) {
+                    const value = visitData[i][j][selectedMetric];
+                    if (value > maxValue) maxValue = value;
+                }
+            }
+
+            // グリッド表示
+            let gridHTML = '<div class="grid-container"><table class="grid-table">';
+            for (let i = 0; i < N; i++) {
+                gridHTML += '<tr>';
+                for (let j = 0; j < N; j++) {
+                    const data = visitData[i][j];
+                    const displayValue = data[selectedMetric];
+
+                    // カラーグラデーション計算
+                    let bgColor = 'white';
+                    if (displayValue > 0 && maxValue > 0) {
+                        const intensity = Math.min(displayValue / maxValue, 1);
+                        // メトリクスごとに異なる色を使用
+                        if (selectedMetric === 'visitCount') {
+                            bgColor = `rgba(156, 39, 176, ${intensity})`;  // 紫
+                        } else if (selectedMetric === 'straight') {
+                            bgColor = `rgba(76, 175, 80, ${intensity})`;  // 緑
+                        } else if (selectedMetric === 'turn') {
+                            bgColor = `rgba(255, 152, 0, ${intensity})`;  // オレンジ
+                        } else if (selectedMetric === 'straightCost') {
+                            bgColor = `rgba(33, 150, 243, ${intensity})`;  // 青
+                        } else if (selectedMetric === 'expectedCost') {
+                            bgColor = `rgba(233, 30, 99, ${intensity})`;  // ピンク
+                        }
+                    }
+
+                    gridHTML += `<td class="grid-cell" style="background-color: ${bgColor};" 
+                        title="位置: (${i}, ${j})\n訪問回数: ${data.visitCount}\n直線: ${data.straight}\n曲がり角: ${data.turn}\n直線コスト: ${data.straightCost}\n期待コスト: ${data.expectedCost}">
+                        <div class="grid-cell-content">${displayValue}</div>`;
+
+                    // 壁を描画
+                    if (j < N - 1 && wall_v[i] && wall_v[i][j]) {
+                        gridHTML += '<div class="robot-wall-v"></div>';
+                    }
+                    if (i < N - 1 && wall_h[i] && wall_h[i][j]) {
+                        gridHTML += '<div class="robot-wall-h"></div>';
+                    }
+
+                    gridHTML += `</td>`;
+                }
+                gridHTML += '</tr>';
+            }
+            gridHTML += '</table></div>';
+
+            // 集計情報を計算
+            let totalVisitCount = 0;
+            let totalStraight = 0;
+            let totalTurn = 0;
+            let totalStraightCost = 0;
+            let totalExpectedCost = 0;
+
+            for (let i = 0; i < N; i++) {
+                for (let j = 0; j < N; j++) {
+                    totalVisitCount += visitData[i][j].visitCount;
+                    totalStraight += visitData[i][j].straight;
+                    totalTurn += visitData[i][j].turn;
+                    totalStraightCost += visitData[i][j].straightCost;
+                    totalExpectedCost += visitData[i][j].expectedCost;
+                }
+            }
+
+            document.getElementById('infoSection').innerHTML = `
+                <div class="info-section">
+                    <p><strong>グリッドサイズ (N):</strong> ${N}</p>
+                    <p><strong>目的地数 (K):</strong> ${K}</p>
+                    <p><strong>ステップ上限 (T):</strong> ${T}</p>
+                    <p><strong>到達した目的地:</strong> ${targetIndex} / ${K}</p>
+                    <p><strong>表示メトリクス:</strong> ${selectedMetric === 'visitCount' ? '訪問回数' :
+                    selectedMetric === 'straight' ? '直線' :
+                        selectedMetric === 'turn' ? '曲がり角' :
+                            selectedMetric === 'straightCost' ? '直線コスト' :
+                                selectedMetric === 'expectedCost' ? '期待コスト' : selectedMetric
+                }</p>
+                    <hr style="margin: 10px 0; border: none; border-top: 1px solid #ddd;">
+                    <p><strong>集計情報:</strong></p>
+                    <p style="margin-left: 20px;"><strong>訪問回数の合計:</strong> ${totalVisitCount}</p>
+                    <p style="margin-left: 20px;"><strong>直線回数の合計:</strong> ${totalStraight}</p>
+                    <p style="margin-left: 20px;"><strong>曲がり角回数の合計:</strong> ${totalTurn}</p>
+                    <p style="margin-left: 20px;"><strong>直線コストの合計:</strong> ${totalStraightCost}</p>
+                    <p style="margin-left: 20px;"><strong>期待コストの合計:</strong> ${totalExpectedCost}</p>
+                </div>
+            `;
+            document.getElementById('gridSection').innerHTML = gridHTML;
+            document.getElementById('infoSection').style.display = 'block';
+        }
+
+        function addHighlightListeners() {
+            // テーブルのセルにイベントリスナーを追加
+            document.querySelectorAll('.rule-cell').forEach(cell => {
+                cell.addEventListener('mouseenter', function () {
+                    const ruleKey = this.getAttribute('data-rule-key');
+                    highlightRules(ruleKey);
+                });
+                cell.addEventListener('mouseleave', function () {
+                    clearHighlight();
+                });
+            });
+
+            // 統計アイテムにイベントリスナーを追加
+            document.querySelectorAll('.stats-item').forEach(item => {
+                item.addEventListener('mouseenter', function () {
+                    const ruleKey = this.getAttribute('data-rule-key');
+                    highlightRules(ruleKey);
+                });
+                item.addEventListener('mouseleave', function () {
+                    clearHighlight();
+                });
+            });
+        }
+
+        function highlightRules(ruleKey) {
+            // すべての同じruleKeyを持つセルと統計アイテムをハイライト
+            document.querySelectorAll(`[data-rule-key="${ruleKey}"]`).forEach(elem => {
+                elem.classList.add('highlighted');
+            });
+        }
+
+        function clearHighlight() {
+            document.querySelectorAll('.highlighted').forEach(elem => {
+                elem.classList.remove('highlighted');
+            });
+        }
+
+        // ページ読み込み時に0.outを読み込む処理は、ユーザーが手動で貼り付けることを想定
+
+        // ==================== Robot Mode Functions ====================
+
+        // ジャッジコードと同じ色計算ロジック
+        function computeColor(val, maxVal) {
+            let normalizedVal = val / maxVal;
+            normalizedVal = Math.min(1.0, Math.max(0.0, normalizedVal));
+
+            let r, g, b;
+            if (normalizedVal < 0.5) {
+                const x = normalizedVal * 2.0;
+                r = 30.0 * (1.0 - x) + 144.0 * x;
+                g = 144.0 * (1.0 - x) + 255.0 * x;
+                b = 255.0 * (1.0 - x) + 30.0 * x;
+            } else {
+                const x = normalizedVal * 2.0 - 1.0;
+                r = 144.0 * (1.0 - x) + 255.0 * x;
+                g = 255.0 * (1.0 - x) + 30.0 * x;
+                b = 30.0 * (1.0 - x) + 70.0 * x;
+            }
+
+            const rInt = Math.round(r);
+            const gInt = Math.round(g);
+            const bInt = Math.round(b);
+
+            return `#${rInt.toString(16).padStart(2, '0')}${gInt.toString(16).padStart(2, '0')}${bInt.toString(16).padStart(2, '0')}`;
+        }
+
+        function initRobotState() {
+            if (!parsedInput || !parsedOutput) return null;
+
+            const { N, K, T, wall_v, wall_h, targets } = parsedInput;
+            const { initialColors, rules } = parsedOutput;
+
+            return {
+                step: 0,
+                maxSteps: T,
+                pos: [...targets[0]],
+                state: 0,
+                colors: initialColors.map(row => [...row]),
+                targetIndex: 1,
+                targets: targets,
+                rules: rules,
+                wall_v: wall_v,
+                wall_h: wall_h,
+                N: N,
+                K: K,
+                finished: false,
+                history: []
+            };
+        }
+
+        function resetRobot() {
+            stopAutoPlay();
+            robotState = initRobotState();
+            renderRobotGrid();
+        }
+
+        function stepRobot() {
+            if (!robotState || robotState.finished) return;
+
+            const { pos, state, colors, rules, wall_v, wall_h, N, targets, targetIndex } = robotState;
+            const [r, c] = pos;
+
+            const currentColor = colors[r][c];
+            const key = `${currentColor},${state}`;
+
+            if (!rules.has(key)) {
+                robotState.finished = true;
+                renderRobotGrid();
+                return;
+            }
+
+            const rule = rules.get(key);
+
+            robotState.history.push({
+                step: robotState.step,
+                pos: [...pos],
+                color: currentColor,
+                state: state,
+                rule: rule
+            });
+
+            colors[r][c] = rule.a;
+            robotState.state = rule.s;
+
+            const dirMap = { 'U': [-1, 0], 'D': [1, 0], 'L': [0, -1], 'R': [0, 1], 'S': [0, 0] };
+            const [dr, dc] = dirMap[rule.d] || [0, 0];
+
+            let canMove = true;
+            if (rule.d !== 'S') {
+                const nr = r + dr;
+                const nc = c + dc;
+
+                if (nr < 0 || nr >= N || nc < 0 || nc >= N) {
+                    canMove = false;
+                } else {
+                    if (dr === 0 && dc !== 0) {
+                        const minC = Math.min(c, nc);
+                        if (r < wall_v.length && minC >= 0 && minC < wall_v[r].length) {
+                            if (wall_v[r][minC]) {
+                                canMove = false;
+                            }
+                        }
+                    } else if (dc === 0 && dr !== 0) {
+                        const minR = Math.min(r, nr);
+                        if (minR >= 0 && minR < wall_h.length && c >= 0 && c < wall_h[minR].length) {
+                            if (wall_h[minR][c]) {
+                                canMove = false;
+                            }
+                        }
+                    }
+                }
+
+                if (canMove) {
+                    robotState.pos = [nr, nc];
+
+                    if (targetIndex < targets.length &&
+                        nr === targets[targetIndex][0] &&
+                        nc === targets[targetIndex][1]) {
+                        robotState.targetIndex++;
+
+                        if (robotState.targetIndex >= targets.length) {
+                            robotState.finished = true;
+                        }
+                    }
+                }
+            }
+
+            robotState.step++;
+
+            if (robotState.step >= robotState.maxSteps) {
+                robotState.finished = true;
+            }
+
+            renderRobotGrid();
+        }
+
+        function renderRobotGrid() {
+            if (!robotState) return;
+
+            const { N, pos, state, colors, targets, targetIndex, step, maxSteps, finished, K, wall_v, wall_h } = robotState;
+            const [robotR, robotC] = pos;
+
+            // C (最大色数) を計算
+            const C = parsedOutput ? parsedOutput.C : Math.max(...colors.flat()) + 1;
+
+            const currentColor = colors[robotR][robotC];
+            document.getElementById('infoSection').innerHTML = `
+                <div class="info-section">
+                    <p><strong>ステップ:</strong> ${step} / ${maxSteps}</p>
+                    <p><strong>位置:</strong> (${robotR}, ${robotC})</p>
+                    <p><strong>現在の色:</strong> ${currentColor}</p>
+                    <p><strong>内部状態:</strong> ${state}</p>
+                    <p><strong>到達した目的地:</strong> ${targetIndex} / ${K}</p>
+                    <p><strong>状態:</strong> ${finished ? '終了' : '実行中'}</p>
+                </div>
+            `;
+            document.getElementById('infoSection').style.display = 'block';
+
+            const D = 50;
+            let gridHTML = '<div class="grid-container"><table class="grid-table">';
+
+            for (let i = 0; i < N; i++) {
+                gridHTML += '<tr>';
+                for (let j = 0; j < N; j++) {
+                    const cellColor = colors[i][j];
+                    const isRobot = (i === robotR && j === robotC);
+                    const isTarget = targetIndex < targets.length &&
+                        i === targets[targetIndex][0] &&
+                        j === targets[targetIndex][1];
+
+                    // ジャッジコードと同じ色計算を使用
+                    const bgColor = computeColor(cellColor, C);
+
+                    gridHTML += `<td class="robot-grid-cell" style="width: ${D}px; height: ${D}px; background-color: ${bgColor};" title="位置: (${i}, ${j})\n色: ${cellColor}">`;
+                    gridHTML += `<div class="cell-color-indicator" style="color: white; text-shadow: 1px 1px 2px black;">${cellColor}</div>`;
+
+                    if (isRobot) {
+                        gridHTML += '<div class="robot-icon">🤖</div>';
+                    }
+                    if (isTarget) {
+                        gridHTML += '<div class="target-icon">🚩</div>';
+                    }
+
+                    if (j < N - 1 && wall_v[i] && wall_v[i][j]) {
+                        gridHTML += '<div class="robot-wall-v"></div>';
+                    }
+                    if (i < N - 1 && wall_h[i] && wall_h[i][j]) {
+                        gridHTML += '<div class="robot-wall-h"></div>';
+                    }
+
+                    gridHTML += '</td>';
+                }
+                gridHTML += '</tr>';
+            }
+
+            gridHTML += '</table></div>';
+            document.getElementById('robotSection').innerHTML = gridHTML;
+        }
+
+        function toggleAutoPlay() {
+            if (autoPlayInterval) {
+                stopAutoPlay();
+            } else {
+                startAutoPlay();
+            }
+        }
+
+        function startAutoPlay() {
+            if (!robotState || robotState.finished) return;
+
+            const btnAutoPlay = document.getElementById('btnAutoPlay');
+            btnAutoPlay.textContent = '⏸ 停止';
+
+            const delay = 1000 / autoPlaySpeed;
+            autoPlayInterval = setInterval(() => {
+                if (robotState && !robotState.finished) {
+                    stepRobot();
+                } else {
+                    stopAutoPlay();
+                }
+            }, delay);
+        }
+
+        function stopAutoPlay() {
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+                const btnAutoPlay = document.getElementById('btnAutoPlay');
+                if (btnAutoPlay) {
+                    btnAutoPlay.textContent = '⏯ 自動再生';
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
